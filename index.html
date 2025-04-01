@@ -2,46 +2,113 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, minimum-scale=1.0">
     <title>报销项目查询系统</title>
     <style>
+        /* 基础重置 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 整体布局 */
         body {
             font-family: 'Microsoft YaHei', sans-serif;
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
+            line-height: 1.6;
+            background: #f8f9fa;
+            padding: 12px;
+            min-height: 100vh;
         }
+
+        h2 {
+            color: #2c7be5;
+            text-align: center;
+            font-size: 1.8rem;
+            margin: 15px 0 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e3ebf6;
+        }
+
+        /* 搜索框 */
         #searchBox {
-            width: 300px;
-            padding: 10px;
+            width: 100%;
+            padding: 14px 16px;
             margin-bottom: 20px;
             border: 2px solid #4CAF50;
-            border-radius: 5px;
+            border-radius: 10px;
+            font-size: 16px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(78, 115, 223, 0.1);
         }
+
+        /* 结果项 */
         .result-item {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e6ed;
         }
+
         .highlight {
-            color: #ff4444;
-            font-weight: bold;
+            color: #e63757;
+            font-weight: 700;
         }
+
         .column-title {
-            color: #2196F3;
-            font-weight: bold;
-            margin-top: 10px;
+            color: #2c7be5;
+            font-weight: 600;
+            font-size: 15px;
+            margin: 12px 0 6px;
+        }
+
+        /* 移动端优化 */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+                margin: 10px 0 20px;
+            }
+
+            #searchBox {
+                font-size: 15px;
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .result-item {
+                padding: 14px;
+                font-size: 14px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            .result-item div {
+                line-height: 1.5;
+                margin-bottom: 8px;
+            }
+
+            .column-title {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
     <h2>报销项目查询系统</h2>
-    <input type="text" id="searchBox" placeholder="输入至少2个字符进行查询（例如：聚餐、车费）">
+    <input type="text" id="searchBox" placeholder="输入关键词（如：车费、聚餐）">
     <div id="results"></div>
-
-    <script>
-        // 报销数据
+ <script>
+        // 报销数据（保持原有数据结构不变）
         const baoxiaoData = [{
     "对应报销项目": "每月聚餐",
     "报销项目": "聚餐费",
@@ -215,12 +282,18 @@
     "摘要": "第三方名称+单数*单价+金额",
     "摘要填写示例": "美团外卖自配送费200*3",
     "票据及流程要求": "1、网购截图/正规发票/合格收据<br>2、钉钉特批：督导-经理-会计"
-}
-];
-// 查询功能
-            document.getElementById('searchBox').addEventListener('input', function(e) {
+}];
+
+        // 查询功能（优化移动端输入体验）
+        const searchBox = document.getElementById('searchBox');
+        const resultsContainer = document.getElementById('results');
+        
+        // 添加防抖处理
+        let searchTimer;
+        searchBox.addEventListener('input', function(e) {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
                 const keyword = e.target.value.trim();
-                const resultsContainer = document.getElementById('results');
                 resultsContainer.innerHTML = '';
 
                 if (keyword.length >= 2) {
@@ -242,11 +315,12 @@
                         resultsContainer.appendChild(div);
                     });
 
-                    if (filteredData.length === 0) {
+                    if (!filteredData.length) {
                         resultsContainer.innerHTML = `<div class="result-item">未找到相关报销项目</div>`;
                     }
                 }
-            });
-        </script>
-    </body>
+            }, 300); // 300毫秒防抖延迟
+        });
+    </script>
+</body>
 </html>
